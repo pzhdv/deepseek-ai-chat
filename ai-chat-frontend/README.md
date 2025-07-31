@@ -2,7 +2,7 @@
 
 ## 效果演示
 
-![演示图AI.gif](/demo/AI.gif)
+![演示图AI.gif](./demo/AI.gif)
 
 ## 功能特性
 
