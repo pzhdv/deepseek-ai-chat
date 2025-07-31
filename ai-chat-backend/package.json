@@ -1,0 +1,38 @@
+{
+  "name": "ai-chat-backend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon -r tsconfig-paths/register --exec ts-node src/index.ts",
+    "prod": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "npx babel src --out-dir dist --extensions \".ts,.tsx\" --copy-files",
+    "start": "cross-env NODE_ENV=production node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "openai": "^5.10.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.0",
+    "@babel/core": "^7.28.0",
+    "@babel/plugin-transform-typescript": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-typescript": "^7.27.1",
+    "@babel/register": "^7.27.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  }
+}

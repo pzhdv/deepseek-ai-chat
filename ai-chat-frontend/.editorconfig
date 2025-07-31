@@ -1,0 +1,54 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# 顶层配置文件，停止向上查找
+# 设置 root=true 表示这是项目的根配置文件，防止向上查找其他 `.editorconfig` 文件。
+root = true
+
+# 通用设置适用于所有文件
+# 这些设置是默认规则，适用于所有文件，除非被特定文件类型的规则覆盖。
+[*]
+# 设置文件编码为 UTF-8，这是现代开发中最常用的字符编码。
+charset = utf-8
+
+# 设置换行符为 LF（Unix 风格），这是大多数现代编辑器和开发环境推荐的格式。
+end_of_line = lf
+
+# 设置缩进风格为使用空格，而不是制表符。
+indent_style = space
+
+# 设置默认的缩进大小为 2 个空格。
+indent_size = 2
+
+# 设置为 true，保存文件时会删除行尾的多余空格。
+trim_trailing_whitespace = true
+
+# 设置为 true，确保文件以换行符结尾。
+insert_final_newline = true
+
+# 针对特定文件类型的设置
+# 以下是对特定文件类型的特殊规则，覆盖通用设置。
+
+# Markdown 文件
+# Markdown 文件中可能需要保留行尾空格来实现某些格式效果，因此禁用行尾空格清理。
+[*.md]
+trim_trailing_whitespace = false
+
+# JavaScript/JSX/TypeScript/TSX 文件
+# 这些文件通常使用 2 个空格作为缩进。
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+
+# YAML 文件
+# YAML 文件通常使用 2 个空格作为缩进。
+[*.{yml,yaml}]
+indent_size = 2
+
+# HTML 文件
+# HTML 文件通常使用 2 个空格作为缩进。
+[*.html]
+indent_size = 2
+
+# JSON 文件
+# JSON 文件通常使用 2 个空格作为缩进。
+[*.json]
+indent_size = 2

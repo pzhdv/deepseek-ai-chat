@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Markdown 渲染库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 代码高亮库 官方 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <title>DeepSeek AI - 文本响应模式</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <style>
+    :root {
+      --primary-color: #2d8cf0;
+      --secondary-color: #52c41a;
+      --danger-color: #ff4d4f;
+      --warning-color: #faad14;
+      --bot-bg: #f5f5f5;
+      --user-bg: #e6f7ff;
+      --error-bg: #fff2f0;
+      --success-bg: #f6ffed;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), #1890ff);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(45, 140, 240, 0.2);
+    }
+
+    .header-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .chat-container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 95%;
+      overflow: hidden;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 15px;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .bot-message {
+      background: var(--bot-bg);
+      align-self: flex-start;
+      border-bottom-left-radius: 3px;
+    }
+
+    .user-message {
+      background: var(--user-bg);
+      align-self: flex-end;
+      border-bottom-right-radius: 3px;
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 12px 20px;
+      color: #666;
+      font-style: italic;
+      background: rgba(45, 140, 240, 0.05);
+      border-left: 3px solid var(--primary-color);
+      margin: 0 20px;
+      border-radius: 8px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      margin-right: 8px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes typing {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .error-message {
+      background: var(--error-bg);
+      border-left: 3px solid var(--danger-color);
+      color: #a8071a;
+    }
+
+    .success-message {
+      background: var(--success-bg);
+      border-left: 3px solid var(--secondary-color);
+      color: #389e0d;
+    }
+
+    .input-container {
+      border-top: 1px solid #eee;
+      padding: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      resize: none;
+      min-height: 48px;
+      max-height: 120px;
+    }
+
+    #sendButton {
+      padding: 0 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    #sendButton:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container">
+    <div class="header">
+      <div class="header-title">
+        📝 文本响应模式
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="clearChat()" title="清空对话">
+          🗑️ 清空
+        </button>
+        <button class="header-btn" onclick="goHome()" title="返回首页">
+          🏠 首页
+        </button>
+        <button class="header-btn" onclick="switchMode()" title="切换到流式模式">
+          🌊 流式
+        </button>
+      </div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="typing-indicator" id="typing">
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      DeepSeek 正在思考中...
+    </div>
+    <div class="input-container">
+      <textarea id="messageInput" placeholder="输入您的问题..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+      <button id="sendButton" onclick="sendMessage()">
+        <span id="sendText">发送</span>
+        <span id="sendIcon">📤</span>
+      </button>
+    </div>
+  </div>
+</body>
+
+<script>
+  // ========== DOM 元素获取 ==========
+  const messagesEl = document.getElementById('messages');  // 消息容器元素
+  const inputEl = document.getElementById('messageInput'); // 输入框元素
+  inputEl.value = "js写一个冒泡排序" // 给input赋初始值
+  const sendBtn = document.getElementById('sendButton');   // 发送按钮元素
+  const typingEl = document.getElementById('typing');      // 正在输入提示元素
+
+  // ========== 输入框自适应高度 ==========
+  // 监听输入框内容变化，自动调整高度以适应多行文本
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';                        // 重置高度
+    inputEl.style.height = inputEl.scrollHeight + 'px';   // 根据内容设置高度
+  });
+
+  // ========== 消息显示功能 ==========
+  /**
+   * 添加消息到聊天框
+   * @param {string} content - 消息内容
+   * @param {boolean} isUser - 是否为用户消息
+   */
+  function addMessage(content, isUser) {
+    // 创建消息容器元素
+    const messageDiv = document.createElement('div');
+    // 根据消息类型设置CSS类名
+    messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+    // 使用marked库解析Markdown格式的内容
+    messageDiv.innerHTML = marked.parse(content);
+    // 将消息添加到消息容器中
+    messagesEl.appendChild(messageDiv);
+    // 重新高亮所有代码块
+    hljs.highlightAll();
+
+    // 使用 requestAnimationFrame 确保DOM更新后再滚动到底部
+    requestAnimationFrame(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  }
+
+  // ========== 消息发送功能 ==========
+  /**
+   * 发送消息到后端API（基于文本的完整响应）
+   */
+  async function sendMessage() {
+    // 获取并清理输入内容
+    const content = inputEl.value.trim();
+    // 如果内容为空或按钮已禁用，则不执行
+    if (!content || sendBtn.disabled) return;
+
+    // ========== UI状态更新 ==========
+    inputEl.value = '';                    // 清空输入框
+    inputEl.style.height = 'auto';         // 重置输入框高度
+    sendBtn.disabled = true;               // 禁用发送按钮防止重复发送
+
+    // 添加用户消息到聊天界面
+    addMessage(content, true);
+
+    // 显示"DeepSeek 正在输入..."提示
+    typingEl.style.display = 'block';
+    // 确保滚动到最新消息
+    requestAnimationFrame(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    try {
+      // ========== API请求 ==========
+      // 调用后端DeepSeek聊天API
+      const response = await fetch('/api/ai/chat-deepseek', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "messages": [
+            { "role": "system", "content": "You are a helpful assistant." },
+            { "role": "user", "content": content }
+          ]
+        })
+      });
+
+      // ========== HTTP状态码异常处理 ==========
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${response.statusText}${errorText ? ' - ' + errorText : ''}`);
+      }
+
+      // ========== 响应解析异常处理 ==========
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        throw new Error(`响应解析失败: ${parseError.message}`);
+      }
+
+      // ========== 业务逻辑异常处理 ==========
+      if (!responseData || !responseData.data) {
+        throw new Error('服务器返回数据格式异常');
+      }
+
+      // 打印返回数据用于调试
+      console.log("返回数据:", responseData.data)
+      // 将AI回复添加到聊天界面
+      addMessage(responseData.data, false);
+    } catch (error) {
+      // ========== 统一异常处理 ==========
+      console.error('请求异常:', error);
+
+      let errorMessage = '请求失败';
+
+      // 网络连接异常
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = '网络连接失败，请检查网络连接';
+      }
+      // 请求超时异常
+      else if (error.name === 'AbortError') {
+        errorMessage = '请求超时，请稍后重试';
+      }
+      // HTTP状态码异常
+      else if (error.message.includes('HTTP')) {
+        errorMessage = `服务器错误: ${error.message}`;
+      }
+      // JSON解析异常
+      else if (error.message.includes('响应解析失败')) {
+        errorMessage = '服务器响应格式错误';
+      }
+      // 业务逻辑异常
+      else if (error.message.includes('数据格式异常')) {
+        errorMessage = '服务器返回数据异常';
+      }
+      // 其他未知异常
+      else {
+        errorMessage = `未知错误: ${error.message}`;
+      }
+
+      addMessage(`❌ ${errorMessage}`, false);
+    } finally {
+      // ========== 清理工作 ==========
+      // 隐藏正在输入提示
+      typingEl.style.display = 'none';
+      // 重新启用发送按钮
+      sendBtn.disabled = false;
+    }
+  }
+
+  // ========== 工具函数 ==========
+  /**
+   * 清空聊天记录
+   */
+  function clearChat() {
+    if (confirm('确定要清空所有对话记录吗？')) {
+      messagesEl.innerHTML = '';
+      console.log('聊天记录已清空');
+    }
+  }
+
+  /**
+   * 返回首页
+   */
+  function goHome() {
+    window.location.href = '/';
+  }
+
+  /**
+   * 切换到流式模式
+   */
+  function switchMode() {
+    window.location.href = '/基于流.html';
+  }
+
+  // ========== 页面初始化 ==========
+  document.addEventListener('DOMContentLoaded', () => {
+    // 聚焦输入框
+    inputEl.focus();
+
+    // 添加欢迎消息
+    setTimeout(() => {
+      addMessage('👋 欢迎使用 DeepSeek AI 文本响应模式！\n\n在这个模式下，AI 会在思考完成后一次性返回完整的回答。您可以：\n\n• 输入任何问题或请求\n\n• 点击右上角按钮切换模式或清空对话\n\n现在就开始对话吧！', false);
+    }, 500);
+  });
+
+</script>
+
+</html>

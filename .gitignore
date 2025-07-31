@@ -1,0 +1,9 @@
+dist/
+node_modules/
+# 忽略所有 .env 相关文件
+.env
+.env.development
+.env.production
+.env.*
+# 例外：保留示例文件（如果需要）
+!.env.example
